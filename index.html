@@ -3,354 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tic Tac Toe – Single Page</title>
+  <title>Tic Tac Toe</title>
   <style>
-    :root {
-      --bg: #0b1020;
-      --panel: #131b35;
-      --accent: #7c5cff;
-      --accent-2: #26d1c4;
-      --text: #e9eefc;
-      --muted: #9fb0d3;
-      --danger: #ff6b6b;
-      --win: #1f9d7a;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text);
-      background: radial-gradient(1200px 800px at 80% -10%, #1d2550 0%, transparent 60%),
-                  radial-gradient(1200px 800px at 10% 110%, #0f5e7a 0%, transparent 60%),
-                  var(--bg);
+    }
+    h1 { margin-bottom: 20px; }
+    .board {
       display: grid;
-      place-items: center;
-      padding: 24px;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
     }
-
-    .app {
-      width: min(900px, 96vw);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: clamp(16px, 4vw, 28px);
-    }
-
-    .header {
+    .cell {
+      background: #fff;
+      border: 2px solid #ccc;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .title {
-      display: flex; align-items: center; gap: 12px;
-    }
-
-    .logo {
-      width: 42px; height: 42px; border-radius: 12px;
-      display: grid; place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white; font-weight: 900; letter-spacing: .08em;
-      box-shadow: 0 8px 20px rgba(124,92,255,.35);
-    }
-
-    h1 { font-size: clamp(20px, 3vw, 28px); margin: 0; }
-    .muted { color: var(--muted); font-size: 14px; }
-
-    .scoreboard {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: grid; gap: 6px;
-      min-height: 64px;
-    }
-
-    .card .label { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-    .card .value { font-size: 22px; font-weight: 800; }
-
-    .board-wrapper {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 18px;
-    }
-
-    @media (max-width: 860px) {
-      .board-wrapper { grid-template-columns: 1fr; }
-    }
-
-    .board {
-      aspect-ratio: 1/1;
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 16px;
-      padding: 14px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .cell {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.02);
-      display: grid; place-items: center;
-      font-weight: 900;
-      font-size: clamp(30px, 7.5vw, 60px);
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
       cursor: pointer;
-      transition: transform .12s ease, background .2s ease, border-color .2s ease;
-      user-select: none;
-      position: relative;
-      outline: none;
     }
-    .cell:focus-visible { box-shadow: 0 0 0 3px rgba(124,92,255,.5); }
-    .cell:hover { transform: translateY(-2px); background: rgba(124,92,255,.08); border-color: rgba(124,92,255,.45); }
-    .cell[disabled] { cursor: not-allowed; opacity: .7; transform: none; }
-
-    .cell .mark { transform: translateY(2px); }
-    .cell.x .mark { text-shadow: 0 8px 20px rgba(124,92,255,.3); }
-    .cell.o .mark { text-shadow: 0 8px 20px rgba(38,209,196,.3); }
-
-    .cell.win { background: rgba(31,157,122,.18) !important; border-color: rgba(31,157,122,.8) !important; }
-
-    .sidebar { display: grid; gap: 12px; }
-
-    .status {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: grid; gap: 6px;
-      min-height: 72px;
-    }
-
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      border-radius: 999px; padding: 6px 12px;
-      background: rgba(124,92,255,.15);
-      border: 1px solid rgba(124,92,255,.5);
-      width: fit-content; font-weight: 700; letter-spacing: .04em;
-    }
-
-    .controls { display: grid; gap: 10px; grid-auto-rows: 1fr; }
-
-    .btn {
-      border: 1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      padding: 12px 14px;
-      border-radius: 12px;
-      color: var(--text);
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
-    }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.28); }
-
-    .btn.accent { border-color: rgba(124,92,255,.6); background: linear-gradient(180deg, rgba(124,92,255,.3), rgba(124,92,255,.12)); }
-    .btn.danger { border-color: rgba(255,107,107,.6); background: linear-gradient(180deg, rgba(255,107,107,.28), rgba(255,107,107,.12)); }
-
-    .footer { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .hint { font-size: 12px; color: var(--muted); }
+    .cell:disabled { cursor: not-allowed; color: #aaa; }
+    .status { margin: 15px 0; font-size: 1.2rem; }
+    .controls { margin-top: 10px; display: flex; gap: 10px; }
+    button { padding: 8px 14px; font-size: 1rem; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Tic Tac Toe game">
-    <div class="header">
-      <div class="title">
-        <div class="logo" aria-hidden="true">TTT</div>
-        <div>
-          <h1>Tic Tac Toe</h1>
-          <div class="muted">Single-page HTML game (2 players on one device)</div>
-        </div>
-      </div>
-      <div class="scoreboard" aria-label="Scoreboard">
-        <div class="card" aria-live="polite"><div class="label">Player X</div><div class="value" id="scoreX">0</div></div>
-        <div class="card" aria-live="polite"><div class="label">Ties</div><div class="value" id="scoreT">0</div></div>
-        <div class="card" aria-live="polite"><div class="label">Player O</div><div class="value" id="scoreO">0</div></div>
-      </div>
-    </div>
-
-    <div class="board-wrapper">
-      <div class="board" id="board" role="grid" aria-label="Tic Tac Toe board">
-        <!-- 9 cells -->
-        <button class="cell" role="gridcell" aria-label="Cell 1" data-index="0"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 2" data-index="1"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 3" data-index="2"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 4" data-index="3"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 5" data-index="4"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 6" data-index="5"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 7" data-index="6"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 8" data-index="7"></button>
-        <button class="cell" role="gridcell" aria-label="Cell 9" data-index="8"></button>
-      </div>
-
-      <div class="sidebar">
-        <div class="status" aria-live="polite">
-          <div class="label">Status</div>
-          <div class="value" id="status">
-            <span class="pill" id="turnPill">X to move</span>
-          </div>
-        </div>
-        <div class="controls">
-          <button class="btn accent" id="btnNewRound">New Round</button>
-          <button class="btn" id="btnRestart">Restart Game (keep scores)</button>
-          <button class="btn danger" id="btnResetScores">Reset Scores</button>
-        </div>
-        <div class="card">
-          <div class="label">How to play</div>
-          <div class="hint">Players take turns tapping a cell. First to get 3 in a row (across, down, or diagonal) wins the round.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">
-      <div class="hint">Keyboard: Tab to a cell, press Enter/Space. New Round clears the board; Restart also clears turn; Reset Scores clears X/O/Ties.</div>
-      <div class="muted">Made with ❤ – no libraries</div>
-    </div>
+  <h1>Tic Tac Toe</h1>
+  <div class="status" id="status">Player X's turn</div>
+  <div class="board" id="board">
+    <button class="cell" data-index="0"></button>
+    <button class="cell" data-index="1"></button>
+    <button class="cell" data-index="2"></button>
+    <button class="cell" data-index="3"></button>
+    <button class="cell" data-index="4"></button>
+    <button class="cell" data-index="5"></button>
+    <button class="cell" data-index="6"></button>
+    <button class="cell" data-index="7"></button>
+    <button class="cell" data-index="8"></button>
+  </div>
+  <div class="controls">
+    <button id="newRound">New Round</button>
+    <button id="reset">Reset Game</button>
   </div>
 
   <script>
-    (function() {
-      const cells = Array.from(document.querySelectorAll('.cell'));
-      const statusEl = document.getElementById('status');
-      const pillEl = document.getElementById('turnPill');
-      const scoreXEl = document.getElementById('scoreX');
-      const scoreOEl = document.getElementById('scoreO');
-      const scoreTEl = document.getElementById('scoreT');
+    const cells = document.querySelectorAll('.cell');
+    const statusEl = document.getElementById('status');
+    const newRoundBtn = document.getElementById('newRound');
+    const resetBtn = document.getElementById('reset');
 
-      const btnNewRound = document.getElementById('btnNewRound');
-      const btnRestart = document.getElementById('btnRestart');
-      const btnResetScores = document.getElementById('btnResetScores');
+    let board = Array(9).fill(null);
+    let current = 'X';
+    let gameOver = false;
 
-      let board = Array(9).fill(null);
-      let current = 'X';
-      let gameOver = false;
-      let scores = { X: 0, O: 0, T: 0 };
+    const wins = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
 
-      const wins = [
-        [0,1,2],[3,4,5],[6,7,8], // rows
-        [0,3,6],[1,4,7],[2,5,8], // cols
-        [0,4,8],[2,4,6]          // diags
-      ];
-
-      function render() {
-        board.forEach((mark, i) => {
-          const c = cells[i];
-          c.textContent = '';
-          c.classList.remove('x','o','win');
-          if (mark) {
-            const span = document.createElement('span');
-            span.className = 'mark';
-            span.textContent = mark;
-            c.appendChild(span);
-            c.classList.add(mark.toLowerCase());
-          }
-          c.disabled = !!mark || gameOver;
-          c.setAttribute('aria-label', `Cell ${i+1} ${mark ? 'contains '+mark : 'empty'}`);
-        });
-        pillEl.textContent = gameOver ? 'Round over' : `${current} to move`;
-        scoreXEl.textContent = scores.X;
-        scoreOEl.textContent = scores.O;
-        scoreTEl.textContent = scores.T;
-      }
-
-      function checkWin() {
-        for (const combo of wins) {
-          const [a,b,c] = combo;
-          if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            return combo; // winning indices
-          }
-        }
-        return null;
-      }
-
-      function handleMove(index) {
-        if (gameOver || board[index]) return;
-        board[index] = current;
-        const combo = checkWin();
-        if (combo) {
-          gameOver = true;
-          combo.forEach(i => cells[i].classList.add('win'));
-          scores[current]++;
-          statusEl.innerHTML = `<span class="pill" style="background: rgba(31,157,122,.2); border-color: rgba(31,157,122,.7)">${current} wins!</span>`;
-          render();
-          return;
-        }
-        if (board.every(Boolean)) {
-          gameOver = true;
-          scores.T++;
-          statusEl.innerHTML = `<span class="pill" style="background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.32)">It's a tie</span>`;
-          render();
-          return;
-        }
-        current = current === 'X' ? 'O' : 'X';
-        statusEl.innerHTML = '';
-        statusEl.appendChild(pillEl);
-        render();
-      }
-
-      function newRound() {
-        board = Array(9).fill(null);
-        gameOver = false;
-        // X starts next round if O just won, otherwise keep alternate start for fairness
-        // Simple rule: the player who *didn't* start last round starts this one
-        current = current === 'X' ? 'O' : 'X';
-        statusEl.innerHTML = '';
-        pillEl.textContent = `${current} to move`;
-        statusEl.appendChild(pillEl);
-        render();
-        // focus first empty cell for accessibility
-        const first = cells.find(c => !c.textContent);
-        if (first) first.focus();
-      }
-
-      function restartGame() {
-        board = Array(9).fill(null);
-        gameOver = false;
-        current = 'X';
-        statusEl.innerHTML = '';
-        pillEl.textContent = `${current} to move`;
-        statusEl.appendChild(pillEl);
-        render();
-      }
-
-      function resetScores() {
-        scores = { X: 0, O: 0, T: 0 };
-        render();
-      }
-
-      // Wire up events
-      cells.forEach((btn) => {
-        btn.addEventListener('click', () => handleMove(Number(btn.dataset.index)));
-        btn.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleMove(Number(btn.dataset.index));
-          }
-        });
+    function render() {
+      board.forEach((mark, i) => {
+        cells[i].textContent = mark || '';
+        cells[i].disabled = !!mark || gameOver;
       });
-      btnNewRound.addEventListener('click', newRound);
-      btnRestart.addEventListener('click', restartGame);
-      btnResetScores.addEventListener('click', resetScores);
+      if (!gameOver) statusEl.textContent = `Player ${current}'s turn`;
+    }
 
-      // initial paint
+    function checkWin() {
+      for (const [a,b,c] of wins) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return true;
+      }
+      return false;
+    }
+
+    function handleMove(i) {
+      if (gameOver || board[i]) return;
+      board[i] = current;
+      if (checkWin()) {
+        statusEl.textContent = `Player ${current} wins!`;
+        gameOver = true;
+      } else if (board.every(Boolean)) {
+        statusEl.textContent = "It's a tie!";
+        gameOver = true;
+      } else {
+        current = current === 'X' ? 'O' : 'X';
+        statusEl.textContent = `Player ${current}'s turn`;
+      }
       render();
-    })();
+    }
+
+    function newRound() {
+      board = Array(9).fill(null);
+      gameOver = false;
+      current = 'X';
+      statusEl.textContent = `Player ${current}'s turn`;
+      render();
+    }
+
+    cells.forEach((c,i) => c.addEventListener('click', () => handleMove(i)));
+    newRoundBtn.addEventListener('click', newRound);
+    resetBtn.addEventListener('click', newRound);
+
+    render();
   </script>
 </body>
 </html>
